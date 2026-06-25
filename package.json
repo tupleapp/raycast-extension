@@ -118,8 +118,15 @@
             "inCall": true,
             "callId": "abc123",
             "muted": false,
+            "transcribing": false,
+            "activeRoomSlug": null,
             "participants": [
-              "Riley Chen"
+              {
+                "name": "Riley Chen",
+                "email": "riley@example.com",
+                "muted": false,
+                "connectionState": "connected"
+              }
             ]
           }
         },
@@ -186,6 +193,7 @@
                 "slug": "tXFZbE",
                 "url": "https://tuple.app/c/tXFZbE",
                 "favorited": false,
+                "activeCall": false,
                 "occupants": [
                   "Riley Chen"
                 ]

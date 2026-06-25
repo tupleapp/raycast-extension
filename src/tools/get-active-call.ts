@@ -4,6 +4,8 @@ import { getActiveCall, isNoActiveCall } from "../lib/tuple";
  * Report whether the user is currently on a Tuple call: the call id, the user's own mute and
  * transcription state, the room slug for a room-based call (null for a direct call), and the other
  * participants — each with an email so follow-up actions (e.g. re-inviting someone) can address them.
+ * A participant's `muted` and `connectionState` are null for room-based calls (the CLI doesn't
+ * surface a peer's audio or connection state there) — treat null as unknown, not as unmuted.
  */
 export default async function () {
   // `tuple call current` returns the normalized roster (self already excluded)
