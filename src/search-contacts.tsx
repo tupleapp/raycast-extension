@@ -71,12 +71,8 @@ function ContactItem({ contact, onChange }: { contact: Contact; onChange: () => 
       actions={
         <ActionPanel>
           {contact.status === "busy" ? (
-            // They're already in a call/room: lead with Join, but keep Start as a fallback for
-            // cases the daemon won't let us join (e.g. a private 1:1 we weren't invited to).
-            <>
-              <Action title="Join Call" icon={Icon.Phone} onAction={() => joinCallWithFeedback(contact)} />
-              <Action title="Start New Call" icon={Icon.PhoneRinging} onAction={() => startCallWithFeedback(contact)} />
-            </>
+            // They're already in a call/room, so joining is the only sensible action.
+            <Action title="Join Call" icon={Icon.Phone} onAction={() => joinCallWithFeedback(contact)} />
           ) : (
             <Action title="Start Call" icon={Icon.Phone} onAction={() => startCallWithFeedback(contact)} />
           )}
