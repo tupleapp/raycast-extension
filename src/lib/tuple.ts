@@ -2,16 +2,7 @@ import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 import { getPreferenceValues } from "@raycast/api";
-import {
-  Contact,
-  CurrentCall,
-  StoredCall,
-  TranscriptMatch,
-  TupleError,
-  TupleErrorKind,
-  TupleRooms,
-  TupleState,
-} from "./types";
+import { CallView, Contact, Room, StoredCall, TranscriptMatch, TupleError, TupleErrorKind } from "./types";
 
 const execFileAsync = promisify(execFile);
 
@@ -150,23 +141,22 @@ export function parseJson<T>(stdout: string): T {
 }
 
 // --- Read wrappers -------------------------------------------------------------------
-// List/search reads are issued directly by the views via useTupleJson; getActiveCall is the
-// one read also needed imperatively (by the no-view mute toggle).
+// List/search reads are issued directly by the views via useTupleJson; getActiveCall and
+// listRooms are the reads also needed imperatively (the no-view mute toggle and the
+// join-personal-room command).
 
-export function getActiveCall(): Promise<CurrentCall> {
-  return runTupleJson<CurrentCall>(["call", "current"]);
+/** The active call as the normalized flat CallView. Throws NoActiveCall when not in a call. */
+export function getActiveCall(): Promise<CallView> {
+  return runTupleJson<CallView>(["call", "current"]);
 }
 
 export async function listContacts(): Promise<Contact[]> {
   return (await runTupleJson<Contact[]>(["contacts", "list"])) ?? [];
 }
 
-export function getState(): Promise<TupleState> {
-  return runTupleJson<TupleState>(["state"]);
-}
-
-export async function getRooms(): Promise<TupleRooms> {
-  return (await getState()).rooms ?? {};
+/** List rooms as one flat, kind-tagged array. Extra args (e.g. "--personal") narrow the result. */
+export async function listRooms(...extraArgs: string[]): Promise<Room[]> {
+  return (await runTupleJson<Room[]>(["rooms", "list", ...extraArgs])) ?? [];
 }
 
 // --- Action wrappers -----------------------------------------------------------------
@@ -303,6 +293,11 @@ export function searchTranscriptSegments(
   }
 
   return emptyIfTranscriptionUnavailable(() => runTupleJson<TranscriptMatch[]>(args));
+}
+
+/** Remove the `[[...]]` match markers `transcription search` adds around matched terms. */
+export function stripMatchMarkers(text: string): string {
+  return text.replace(/\[\[|\]\]/g, "");
 }
 
 /**

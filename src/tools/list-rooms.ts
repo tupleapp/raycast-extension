@@ -1,4 +1,4 @@
-import { getRooms } from "../lib/tuple";
+import { listRooms } from "../lib/tuple";
 import { Room } from "../lib/types";
 
 /**
@@ -7,21 +7,20 @@ import { Room } from "../lib/types";
  * Engineering room?" and "which rooms have someone in them right now?".
  */
 export default async function () {
-  const rooms = await getRooms();
+  // `tuple rooms list` returns one flat, kind-tagged array; split it back into personal/team.
+  const rooms = await listRooms();
   return {
-    personal: (rooms.personal ?? []).map(describeRoom),
-    team: (rooms.team ?? []).map(describeRoom),
+    personal: rooms.filter((room) => room.kind === "personal").map(describeRoom),
+    team: rooms.filter((room) => room.kind === "team").map(describeRoom),
   };
 }
 
 function describeRoom(room: Room) {
   return {
-    name: room.name?.trim() || "Personal Room",
+    name: room.name.trim() || "Personal Room",
     slug: room.slug,
     url: room.http_value,
-    favorited: Boolean(room.favorited),
-    occupants: (room.members ?? [])
-      .map((member) => member.full_name ?? member.short_name ?? member.email)
-      .filter((name): name is string => Boolean(name)),
+    favorited: room.favorited,
+    occupants: room.members.map((member) => member.full_name || member.email).filter(Boolean),
   };
 }

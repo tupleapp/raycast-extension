@@ -1,20 +1,19 @@
 import { showHUD } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
-import { getRooms, joinCall } from "./lib/tuple";
+import { joinCall, listRooms } from "./lib/tuple";
 
 export default async function JoinPersonalRoom() {
   try {
-    const { personal } = await getRooms();
-    const latest = [...(personal ?? [])].sort(
-      (a, b) => new Date(b.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
-    )[0];
+    // `tuple rooms list --personal` returns the user's personal room(s) — the common case is
+    // exactly one. Take the first (the CLI already orders occupied, then favorited, then by name).
+    const [room] = await listRooms("--personal");
 
-    if (!latest) {
+    if (!room) {
       await showHUD("No personal room found");
       return;
     }
 
-    await joinCall(latest.slug);
+    await joinCall(room.slug);
     await showHUD("Joining your personal room");
   } catch (error) {
     await showFailureToast(error, { title: "Could Not Join Personal Room" });
