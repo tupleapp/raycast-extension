@@ -23,6 +23,8 @@ function describeRoom(room: Room) {
     slug: room.slug,
     url: room.http_value,
     favorited: room.favorited,
+    // True when the user's current call is in this room — lets an agent answer "which room am I in?".
+    activeCall: room.active_call,
     occupants: room.members.map((member) => member.full_name || member.email).filter(Boolean),
   };
 }

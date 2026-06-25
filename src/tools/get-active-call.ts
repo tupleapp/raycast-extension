@@ -1,6 +1,10 @@
 import { getActiveCall, isNoActiveCall } from "../lib/tuple";
 
-/** Report whether the user is currently on a Tuple call, with whom, their mute state, and whether they're transcribing it. */
+/**
+ * Report whether the user is currently on a Tuple call: the call id, the user's own mute and
+ * transcription state, the room slug for a room-based call (null for a direct call), and the other
+ * participants — each with an email so follow-up actions (e.g. re-inviting someone) can address them.
+ */
 export default async function () {
   // `tuple call current` returns the normalized roster (self already excluded)
   // and exits non-zero when there is no active call.
@@ -9,10 +13,19 @@ export default async function () {
     return {
       inCall: true,
       callId: call.call_id,
+      // The user's own mic and transcription state (transcription is per-participant).
       muted: call.muted,
-      // Transcription is per-participant; this is whether *you* are transcribing the call.
       transcribing: call.transcribing,
-      participants: call.participants.map((p) => p.name || p.email),
+      // Slug of the room backing the call, or null for a direct call.
+      activeRoomSlug: call.active_room_slug,
+      participants: call.participants.map((p) => ({
+        name: p.name || p.email,
+        email: p.email,
+        // Per-participant mute and connection state, when the call shape carries them (null for
+        // room-based calls, which don't surface a peer's audio or connection state).
+        muted: p.muted,
+        connectionState: p.connection_state,
+      })),
     };
   } catch (error) {
     if (isNoActiveCall(error)) {
