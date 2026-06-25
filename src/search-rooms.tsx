@@ -1,8 +1,8 @@
-import { Action, ActionPanel, Color, Icon, List, showHUD } from "@raycast/api";
+import { Action, ActionPanel, Color, Icon, List, showHUD, showToast, Toast } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { TupleErrorEmptyView } from "./lib/empty-state";
 import { useTupleJson } from "./lib/hooks";
-import { joinCall } from "./lib/tuple";
+import { joinCall, setRoomFavorite } from "./lib/tuple";
 import { Room } from "./lib/types";
 
 export default function SearchRooms() {
@@ -21,12 +21,12 @@ export default function SearchRooms() {
     <List isLoading={isLoading} searchBarPlaceholder="Search your rooms">
       <List.Section title="Personal">
         {personal.map((room) => (
-          <RoomItem key={room.slug} room={room} />
+          <RoomItem key={room.slug} room={room} onChange={revalidate} />
         ))}
       </List.Section>
       <List.Section title="Team">
         {team.map((room) => (
-          <RoomItem key={room.slug} room={room} />
+          <RoomItem key={room.slug} room={room} onChange={revalidate} />
         ))}
       </List.Section>
       {error ? (
@@ -42,7 +42,7 @@ export default function SearchRooms() {
   );
 }
 
-function RoomItem({ room }: { room: Room }) {
+function RoomItem({ room, onChange }: { room: Room; onChange: () => void }) {
   const label = roomLabel(room);
   const occupants = room.members.map((member) => member.full_name || member.email || "Someone");
   const accessories: List.Item.Accessory[] = [];
@@ -71,6 +71,12 @@ function RoomItem({ room }: { room: Room }) {
       actions={
         <ActionPanel>
           <Action title="Join Room" icon={Icon.Phone} onAction={() => joinRoom(room.slug, label)} />
+          <Action
+            title={room.favorited ? "Remove Favorite" : "Add Favorite"}
+            icon={Icon.Star}
+            shortcut={{ modifiers: ["cmd"], key: "f" }}
+            onAction={() => toggleFavorite(room, label, onChange)}
+          />
           <Action.CopyToClipboard title="Copy Room Link" content={room.http_value} />
           <Action.OpenInBrowser title="Open in Browser" url={room.http_value} />
         </ActionPanel>
@@ -85,6 +91,20 @@ async function joinRoom(slug: string, label: string) {
     await showHUD(`Joining ${label}`);
   } catch (error) {
     await showFailureToast(error, { title: "Could Not Join Room" });
+  }
+}
+
+async function toggleFavorite(room: Room, label: string, onChange: () => void) {
+  try {
+    await setRoomFavorite(room.slug, !room.favorited);
+    await showToast({
+      style: Toast.Style.Success,
+      title: room.favorited ? "Removed Favorite" : "Added Favorite",
+      message: label,
+    });
+    onChange();
+  } catch (error) {
+    await showFailureToast(error, { title: "Could Not Update Favorite" });
   }
 }
 
