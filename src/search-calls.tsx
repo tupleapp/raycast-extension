@@ -17,7 +17,6 @@ import {
 import { showFailureToast, useExec } from "@raycast/utils";
 import { useState } from "react";
 import { GenerateCallMetadata, SummarizeCall } from "./call-ai";
-import { stripMatchMarkers } from "./lib/call";
 import { TupleErrorDetail, TupleErrorEmptyView } from "./lib/empty-state";
 import { tupleExecOptions, useTupleJson } from "./lib/hooks";
 import {
@@ -27,6 +26,7 @@ import {
   getBinaryPath,
   getConnectPrompt,
   stripAnsi,
+  stripMatchMarkers,
   toFtsQuery,
 } from "./lib/tuple";
 import { StoredCall, TranscriptMatch, TupleErrorKind } from "./lib/types";
