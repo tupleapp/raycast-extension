@@ -75,7 +75,11 @@ export default function ActiveCallMenuBar() {
         />
         <AddPersonSubmenu contacts={onlineContacts} onChange={call.revalidate} />
         <MenuBarExtra.Item title="Copy AI Context" icon={Icon.Clipboard} onAction={copyCallContext} />
-        <MenuBarExtra.Item title="Hang Up" icon={Icon.PhoneRinging} onAction={() => runAction(hangUpCall, call.revalidate)} />
+        <MenuBarExtra.Item
+          title="Hang Up"
+          icon={Icon.PhoneRinging}
+          onAction={() => runAction(hangUpCall, call.revalidate)}
+        />
       </MenuBarExtra.Section>
     </MenuBarExtra>
   );
