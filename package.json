@@ -207,7 +207,7 @@
     {
       "name": "tuplePath",
       "title": "Tuple CLI Path",
-      "description": "Path to the tuple CLI executable. Leave blank to auto-detect (/opt/homebrew/bin then /usr/local/bin); set this only if you installed it elsewhere.",
+      "description": "Path to the tuple CLI executable. Leave blank to auto-detect (/usr/local/bin/tuple, then the copy bundled in Tuple.app); set this only if your CLI lives elsewhere.",
       "type": "textfield",
       "required": false,
       "placeholder": "/usr/local/bin/tuple"

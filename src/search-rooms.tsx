@@ -6,9 +6,10 @@ import { joinCall } from "./lib/tuple";
 import { Room } from "./lib/types";
 
 export default function SearchRooms() {
-  // `tuple rooms list` returns one flat, kind-tagged array (with occupants and the active-room
-  // marker resolved server-side), so the view no longer reads the full `tuple state` blob.
-  const { data, isLoading, error, revalidate } = useTupleJson<Room[]>(["rooms", "list"], {
+  // `tuple rooms list` returns one flat, kind-tagged array, with occupants and the active-room
+  // marker resolved server-side. Pass --limit -1: this picker shows the user's complete room
+  // list, so opt out of the CLI's default count cap.
+  const { data, isLoading, error, revalidate } = useTupleJson<Room[]>(["rooms", "list", "--limit", "-1"], {
     failureTitle: "Could Not Load Rooms",
   });
 

@@ -7,7 +7,9 @@ import { Room } from "../lib/types";
  * Engineering room?" and "which rooms have someone in them right now?".
  */
 export default async function () {
-  // `tuple rooms list` returns one flat, kind-tagged array; split it back into personal/team.
+  // `tuple rooms list` returns one flat, kind-tagged array; split it back into personal/team. The
+  // CLI's default count cap applies — an agent answering "which rooms have someone in them?" doesn't
+  // need an unbounded dump that floods the model's context on large teams.
   const rooms = await listRooms();
   return {
     personal: rooms.filter((room) => room.kind === "personal").map(describeRoom),

@@ -58,7 +58,7 @@ export default function ActiveCallMenuBar() {
       {others.length > 0 && (
         <MenuBarExtra.Section title="In a Call">
           {others.map((person) => (
-            <MenuBarExtra.Item key={person.id} title={personName(person)} icon={Icon.Person} />
+            <MenuBarExtra.Item key={person.id || person.email} title={personName(person)} icon={Icon.Person} />
           ))}
         </MenuBarExtra.Section>
       )}
