@@ -18,7 +18,9 @@ extension wraps the local `tuple` command-line tool.
 ## Commands
 
 - **Search Contacts** — Browse your contacts with online status, favorites, and recents.
-  Start a call, toggle a favorite, or copy an email.
+  Start a call, toggle a favorite, or copy an email. Everyone stays listed, but the call
+  action matches what Tuple will accept: start a call with someone online, join the call
+  someone's already on while it has room, and neither for someone offline or on a full call.
 - **Active Call** — A menu-bar command showing your current call. Mute/unmute, start or stop
   transcription, add a person, copy an AI context prompt, or hang up — without leaving the menu bar.
 - **Toggle Mute** — Mute or unmute your microphone in the active call. Bind it to a global
