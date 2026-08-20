@@ -6,6 +6,7 @@ import { getPreferenceValues } from "@raycast/api";
 import {
   CallView,
   Contact,
+  OngoingCall,
   Room,
   StoredCall,
   TranscriptMatch,
@@ -66,11 +67,6 @@ export function jsonArgs(...args: string[]): string[] {
 /** Stderr fragments that mean the CLI couldn't reach the Tuple daemon (app not running). */
 const DAEMON_DOWN_SIGNALS = ["tuple.sock", "dial unix", "connection refused", "connect: no such file"];
 
-/**
- * Map the CLI's stable `kind` / `error_code` to an extension error kind.
- * Returns null for a payload with no specific handling here, so the caller
- * falls through to the prose classifier.
- */
 function fromPayload(payload: TupleErrorPayload): { kind: TupleErrorKind; message: string } | null {
   const message = payload.error?.trim();
   switch (payload.kind) {
@@ -80,6 +76,15 @@ function fromPayload(payload: TupleErrorPayload): { kind: TupleErrorKind; messag
       return { kind: TupleErrorKind.ContactBusy, message: message || "They’re already on a call." };
     case "invalid_call":
       return { kind: TupleErrorKind.NotJoinable, message: message || "That call can’t be joined." };
+    case "conflict":
+      return {
+        kind: TupleErrorKind.AlreadyInCall,
+        message: message || "You’re already in a call. Hang up first, then join.",
+      };
+  }
+  // Older structured envelopes had an HTTP status but no stable kind.
+  if (payload.kind) {
+    return null;
   }
   switch (payload.error_code) {
     case 409:
@@ -132,7 +137,6 @@ export function classifyError(error: unknown): TupleError {
     );
   }
 
-  // Preferred path on current CLIs: branch on the stable kind/code.
   const payload = parseErrorPayload(stdout);
   if (payload) {
     const classified = fromPayload(payload);
@@ -234,6 +238,11 @@ export async function listContacts(): Promise<Contact[]> {
   return (await runTupleJson<Contact[]>(["contacts", "list"])) ?? [];
 }
 
+/** Ongoing calls, grouped and privacy-normalized by the CLI. */
+export async function listOngoingCalls(): Promise<OngoingCall[]> {
+  return (await runTupleJson<OngoingCall[]>(["call", "list"])) ?? [];
+}
+
 /** List rooms as one flat, kind-tagged array. Extra args (e.g. "--kind", "personal") narrow the result. */
 export async function listRooms(...extraArgs: string[]): Promise<Room[]> {
   return (await runTupleJson<Room[]>(["rooms", "list", ...extraArgs])) ?? [];
@@ -253,17 +262,34 @@ async function runTupleAction(args: string[]): Promise<void> {
   await runTuple(jsonArgs(...args));
 }
 
+function isUnsupportedFlag(error: unknown, flag: string): boolean {
+  const classified = classifyError(error);
+  return `${classified.message}\n${classified.detail ?? ""}`.toLowerCase().includes(`unknown flag: ${flag}`);
+}
+
+async function runTupleActionWithFallback(args: string[], optionalArgs: string[]): Promise<void> {
+  try {
+    await runTupleAction([...args, ...optionalArgs]);
+  } catch (error) {
+    const unsupported = optionalArgs.find((arg) => arg.startsWith("--") && isUnsupportedFlag(error, arg));
+    if (!unsupported) {
+      throw error;
+    }
+    await runTupleAction(args);
+  }
+}
+
 export function startCall(email: string): Promise<void> {
-  return runTupleAction(["call", "start", email]);
+  return runTupleActionWithFallback(["call", "start", email], ["--wait", "--timeout", "12s"]);
 }
 
 export function addToCall(email: string): Promise<void> {
-  return runTupleAction(["call", "add", email]);
+  return runTupleActionWithFallback(["call", "add", email], ["--wait", "--timeout", "12s"]);
 }
 
-/** Join a call/room by person name or room URL/slug. */
+/** Join a call/room by person name or room URL/slug, switching from the current call when needed. */
 export function joinCall(target: string): Promise<void> {
-  return runTupleAction(["call", "join", target]);
+  return runTupleActionWithFallback(["call", "join", target], ["--switch"]);
 }
 
 export function setFavorite(email: string, favorited: boolean): Promise<void> {

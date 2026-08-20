@@ -1,9 +1,13 @@
 # Tuple Changelog
 
-## [Call Actions] - {PR_MERGE_DATE}
+## [Smarter Calls and Rooms] - {PR_MERGE_DATE}
 
-- **Contacts**: each person now offers only the call action Tuple will accept. Start a call with someone online, join the call someone's already on while it has room, and neither when they're offline or their call is full. Everyone stays listed, and favorites, search, and Copy Email work as before.
-- A busy contact whose call is full now reads **Call Full** rather than **In a Call**, so the missing Join Call has a visible reason.
+- **Contacts** now show only the call action that person can accept: start when they're online, join when their call has room, and neither when they're offline or the call is full. Favorites, search, and Copy Email still work for everyone.
+- Full calls now say **Call Full** instead of **In a Call**, so it's clear why Join Call isn't available.
+- Raycast reports success only after a call connects. Joining a contact or room switches cleanly from your current call.
+- **Join Personal Room** now chooses Tuple's primary room instead of relying on list order, and Search Rooms labels that room explicitly.
+- Ask Raycast AI who is pairing right now to get Tuple's grouped view of active calls.
+- Call failures now use the CLI's typed errors for more accurate guidance, with compatibility fallbacks for older Tuple builds.
 
 ## [New Tuple Integration] - 2026-06-26
 
