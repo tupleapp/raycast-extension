@@ -80,6 +80,18 @@ export interface CallParticipant {
   email: string;
 }
 
+/** One grouped live call from `tuple call list`. */
+export interface OngoingCall {
+  id: string;
+  participants: CallParticipant[];
+  unknown_participants: number;
+  anonymous: boolean;
+  capacity: number;
+  joinable: boolean;
+  room: { slug: string; name: string } | null;
+  current: boolean;
+}
+
 /** A stored (recorded) call, from `tuple transcription list`. */
 export interface StoredCall {
   call_id: string;
@@ -139,10 +151,24 @@ export interface Room {
   slug: string;
   name: string;
   http_value: string;
+  /** RFC 3339 creation time. Older CLIs omit it. */
+  created_at?: string;
   favorited: boolean;
   members: RoomMember[];
   kind: RoomKind;
   active_call: boolean;
+}
+
+/** The newest-created personal room, matching Tuple's primary-room rule. */
+export function primaryPersonalRoom(rooms: Room[]): Room | undefined {
+  return rooms
+    .filter((room) => room.kind === "personal")
+    .reduce<Room | undefined>((primary, room) => {
+      if (!primary) {
+        return room;
+      }
+      return (room.created_at ?? "") > (primary.created_at ?? "") ? room : primary;
+    }, undefined);
 }
 
 /** One full-text search hit, from `tuple transcription search --format json`. */
@@ -161,7 +187,7 @@ export enum TupleErrorKind {
   NotInstalled = "not_installed",
   /** A call-scoped command ran while no call was active. Often a normal state, not a failure. */
   NoActiveCall = "no_active_call",
-  /** Tried to join a call/room while already in one — the CLI rejects this rather than switching. */
+  /** Tried to join a call/room while already in one without asking the CLI to switch. */
   AlreadyInCall = "already_in_call",
   /** The Tuple app/daemon is not running, so the CLI could not reach it. */
   DaemonDown = "daemon_down",

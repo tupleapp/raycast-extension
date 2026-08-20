@@ -71,12 +71,6 @@ function ContactItem({ contact, onChange }: { contact: Contact; onChange: () => 
       accessories={accessories}
       actions={
         <ActionPanel>
-          {/*
-            Only the call action the contact can actually accept. Someone already
-            on a call can be joined, but not rung; someone offline, or on a call
-            with no room left, gets no call action at all — the CLI rejects both,
-            and the Tuple app's own popover doesn't offer them either.
-          */}
           {callAction === "join" && (
             <Action title="Join Call" icon={Icon.Phone} onAction={() => joinCallWithFeedback(contact)} />
           )}
@@ -141,11 +135,6 @@ function isPresent(contact: Contact): boolean {
   return contact.status === "online" || contact.status === "busy";
 }
 
-/**
- * Status pill: green when online, orange when in a call, muted when offline. A
- * call with no room left says so, since that's the reason its entry offers no
- * Join Call.
- */
 function presenceTag(contact: Contact, callAction: ContactCallAction): { value: string; color: Color } {
   switch (contact.status) {
     case "online":
