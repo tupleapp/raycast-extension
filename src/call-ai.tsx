@@ -114,7 +114,7 @@ function SummaryDetail({
       <Detail
         isLoading
         navigationTitle={`Summary: ${title}`}
-        markdown="_Reading the transcript and drafting a title & summary…_"
+        markdown="_Reading the Capture and drafting a title & summary…_"
       />
     );
   }
@@ -160,7 +160,7 @@ function SummaryDetail({
                 callId={callId}
                 title={title}
                 draft={{ title: draftTitle || title, summary: draftSummary }}
-                description="AI drafted these from the transcript. Edit if you like, then apply."
+                description="AI drafted these from the Capture. Edit if you like, then apply."
                 onApplied={handleEditApplied}
               />
             }

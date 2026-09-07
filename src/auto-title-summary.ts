@@ -64,12 +64,5 @@ export default async function AutoTitleSummary(props: LaunchProps<{ launchContex
 
 /** The most recently started recorded call, or undefined when nothing has been recorded. */
 async function mostRecentCallId(): Promise<string | undefined> {
-  const calls = await listRecordedCalls();
-  if (calls.length === 0) {
-    return undefined;
-  }
-  // The CLI returns calls most-recent-first; prefer the latest started_at, falling back to that order
-  // so a missing or all-equal started_at still yields a real call instead of nothing.
-  const latest = calls.reduce((best, call) => (call.started_at > best.started_at ? call : best), calls[0]);
-  return latest.call_id;
+  return (await listRecordedCalls({ limit: 1 }))[0]?.call_id;
 }
