@@ -75,12 +75,6 @@ function describeTupleError(error: Error): TupleErrorPresentation {
   }
 }
 
-/**
- * Shared error empty-state for list commands, so every command surfaces a missing CLI, a stopped
- * Tuple app, or a not-yet-set-up Capture store the same way — with a deep link to the right
- * Tuple settings pane. Render this only when there is an error; the no-data empty view stays local
- * to each command since its copy is command-specific.
- */
 export function TupleErrorEmptyView({ error, onRetry }: { error: Error; onRetry?: () => void }) {
   const { icon, title, description, actions } = describeTupleError(error);
   const retry = onRetry ? <Action title="Try Again" icon={Icon.ArrowClockwise} onAction={onRetry} /> : null;

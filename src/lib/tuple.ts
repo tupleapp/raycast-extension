@@ -90,6 +90,9 @@ export function classifyError(error: unknown): TupleError {
     payload = undefined;
   }
   const kinds: Record<string, TupleErrorKind> = {
+    no_active_call: TupleErrorKind.NoActiveCall,
+    daemon_down: TupleErrorKind.DaemonDown,
+    transcription_unavailable: TupleErrorKind.CaptureUnavailable,
     contact_offline: TupleErrorKind.ContactOffline,
     contact_busy: TupleErrorKind.ContactBusy,
     invalid_call: TupleErrorKind.NotJoinable,
@@ -150,7 +153,6 @@ export function parseJson<T>(stdout: string): T {
 // listRooms are the reads also needed imperatively (the no-view mute toggle and the
 // join-personal-room command).
 
-/** Canonical bounded metadata for a live or retained call. */
 export async function getCall(callId?: string): Promise<CanonicalCall> {
   const call = await runTupleJson<CanonicalCall>(["call", "show", ...(callId ? [callId] : [])]);
   const optionalText = (value: unknown) => value === null || typeof value === "string";
@@ -195,14 +197,12 @@ export async function listContacts(): Promise<Contact[]> {
   return (await runTupleJson<Contact[]>(["contacts", "list"])) ?? [];
 }
 
-/** Ongoing calls, grouped and privacy-normalized by the CLI. */
 export async function listOngoingCalls(): Promise<OngoingCall[]> {
   return (await runTupleJson<OngoingCall[]>(["call", "list"])) ?? [];
 }
 
-/** List rooms as one flat, kind-tagged array. Extra args (e.g. "--kind", "personal") narrow the result. */
 export async function listRooms(...extraArgs: string[]): Promise<Room[]> {
-  return (await runTupleJson<Room[]>(["rooms", "list", ...extraArgs])) ?? [];
+  return (await runTupleJson<Room[]>(["rooms", "list", "--members", ...extraArgs])) ?? [];
 }
 
 // --- Action wrappers -----------------------------------------------------------------
@@ -227,6 +227,10 @@ export function removeFromCall(email: string): Promise<void> {
 
 export function joinCall(target: string): Promise<void> {
   return runTupleAction(["call", "join", target, "--switch"]);
+}
+
+export function joinRoom(slug: string): Promise<void> {
+  return runTupleAction(["rooms", "join", slug, "--switch"]);
 }
 
 export function setFavorite(email: string, favorited: boolean): Promise<void> {
@@ -258,20 +262,19 @@ export function stopCapture(): Promise<void> {
   return runTupleAction(["capture", "stop"]);
 }
 
-export function setCallTitle(callId: string, title: string): Promise<void> {
-  return runTupleAction(["call", "edit", callId, "--title", title]);
+type CallMetadataUpdate = { title: string; summary?: string } | { title?: string; summary: string };
+
+export function setCallMetadata(callId: string, update: CallMetadataUpdate): Promise<void> {
+  const args = ["call", "edit", callId];
+  if (update.title !== undefined) args.push("--title", update.title);
+  if (update.summary !== undefined) args.push("--summary", update.summary);
+  return runTupleAction(args);
 }
 
-export function setCallSummary(callId: string, summary: string): Promise<void> {
-  return runTupleAction(["call", "edit", callId, "--summary", summary]);
-}
-
-/** Delete the complete stored Capture, including events, content, and retained media. */
 export function deleteCapture(callId: string): Promise<void> {
   return runTupleAction(["capture", "delete", callId]);
 }
 
-/** Export one complete artifact; transcript-only is an explicit selection. */
 export function exportCapture(destination: string, callId?: string, transcriptOnly = false): Promise<ExportReceipt> {
   const args = ["capture", "export", destination];
   if (callId) args.push("--call", callId);
@@ -279,10 +282,9 @@ export function exportCapture(destination: string, callId?: string, transcriptOn
   return runTupleJson<ExportReceipt>(args);
 }
 
-// Built without a literal control char to satisfy no-control-regex.
-const ANSI_PATTERN = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, "g");
+const ANSI_ESCAPE = String.fromCharCode(27);
+const ANSI_PATTERN = new RegExp(`${ANSI_ESCAPE}\\[[0-9;]*m`, "g");
 
-/** Strip terminal styling from text shown by Raycast. */
 export function stripAnsi(text: string): string {
   return text.replace(ANSI_PATTERN, "");
 }
@@ -310,8 +312,7 @@ export async function getCapture(callId: string): Promise<CaptureRecord[]> {
     });
 }
 
-/** Human views and AI summaries retain compact local clock timestamps. */
-export async function getCompactCapture(callId: string): Promise<string> {
+export async function getLocalClockCapture(callId: string): Promise<string> {
   return formatCapture(await getCapture(callId));
 }
 
@@ -337,7 +338,6 @@ export function searchCapture(
   return runTupleJson<CaptureMatch[] | null>(captureSearchArgs(query, opts)).then((matches) => matches ?? []);
 }
 
-/** Remove the `[[...]]` match markers `capture search` adds around matched terms. */
 export function stripMatchMarkers(text: string): string {
   return text.replace(/\[\[|\]\]/g, "");
 }

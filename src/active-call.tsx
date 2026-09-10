@@ -15,7 +15,7 @@ import {
 import { CallViewParticipant, Contact, TupleErrorKind } from "./lib/types";
 
 export default function ActiveCallMenuBar() {
-  const call = usePromise(getActiveCall, [], { keepPreviousData: true, onError: () => {} });
+  const call = usePromise(getActiveCall, [], { onError: () => {} });
   const callError = call.error ? classifyError(call.error) : undefined;
   const noActiveCall = callError?.kind === TupleErrorKind.NoActiveCall;
   const realError = callError && !noActiveCall ? callError : undefined;

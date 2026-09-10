@@ -37,24 +37,13 @@ export function callJoinability(contact: Contact | undefined): Joinability {
   return contact.call.joinable ? "joinable" : "not-joinable";
 }
 
-/**
- * What a contact's entry should offer. Mirrors the Tuple app's popover: no way
- * to ring someone offline, and joining only a call that has room. The CLI
- * enforces the same rules — `call start` at an offline or busy target is
- * rejected outright — so offering the action anyway would just be a button that
- * fails. Forcing past the guard is deliberately not on offer, because the app
- * doesn't offer it either.
- *
- * A status that is neither busy nor offline counts as reachable: the daemon
- * passes presence through verbatim and "available" is a synonym for online.
- */
 export type ContactCallAction = "start" | "join" | "none";
 
 export function contactCallAction(contact: Contact): ContactCallAction {
   if (contact.status === "busy") {
     return callJoinability(contact) === "joinable" ? "join" : "none";
   }
-  return contact.status === "offline" ? "none" : "start";
+  return contact.status === "online" || contact.status === "available" ? "start" : "none";
 }
 
 export interface CallParticipant {
@@ -63,7 +52,6 @@ export interface CallParticipant {
   email: string;
 }
 
-/** One grouped live call from `tuple call list`. */
 export interface OngoingCall {
   id: string;
   participants: CallParticipant[];
@@ -75,7 +63,6 @@ export interface OngoingCall {
   current: boolean;
 }
 
-/** A stored (recorded) call, from `tuple capture list`. */
 export interface StoredCall {
   call_id: string;
   title: string;
@@ -140,7 +127,6 @@ export interface Room {
   active_call: boolean;
 }
 
-/** The newest-created personal room when the CLI provides enough data to identify it reliably. */
 export function primaryPersonalRoom(rooms: Room[]): Room | undefined {
   const personalRooms = rooms.filter((room) => room.kind === "personal");
   if (personalRooms.length <= 1) {
@@ -152,7 +138,6 @@ export function primaryPersonalRoom(rooms: Room[]): Room | undefined {
   return personalRooms.reduce((primary, room) => (room.created_at! > primary.created_at! ? room : primary));
 }
 
-/** One full-text search hit, from `tuple capture search --format json`. */
 export interface CaptureMatch {
   kind: "spoken" | "content";
   app_name?: string;
@@ -211,7 +196,6 @@ export class TupleError extends Error {
   }
 }
 
-/** Stable metadata from call show; live control state is a separate bounded read. */
 export interface CanonicalCall {
   id: string;
   state: "active" | "ended";

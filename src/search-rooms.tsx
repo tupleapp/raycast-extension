@@ -2,14 +2,14 @@ import { Action, ActionPanel, Color, Icon, List, showHUD, showToast, Toast } fro
 import { showFailureToast } from "@raycast/utils";
 import { TupleErrorEmptyView } from "./lib/empty-state";
 import { useTupleJson } from "./lib/hooks";
-import { joinCall, setRoomFavorite } from "./lib/tuple";
+import { joinRoom, setRoomFavorite } from "./lib/tuple";
 import { primaryPersonalRoom, Room } from "./lib/types";
 
 export default function SearchRooms() {
   // `tuple rooms list` returns one flat, kind-tagged array, with occupants and the active-room
   // marker resolved server-side. Pass --limit -1: this picker shows the user's complete room
   // list, so opt out of the CLI's default count cap.
-  const { data, isLoading, error, revalidate } = useTupleJson<Room[]>(["rooms", "list", "--limit", "-1"], {
+  const { data, isLoading, error, revalidate } = useTupleJson<Room[]>(["rooms", "list", "--members", "--limit", "-1"], {
     failureTitle: "Could Not Load Rooms",
   });
 
@@ -77,7 +77,7 @@ function RoomItem({ room, primary = false, onChange }: { room: Room; primary?: b
       accessories={accessories}
       actions={
         <ActionPanel>
-          <Action title="Join Room" icon={Icon.Phone} onAction={() => joinRoom(room.slug, label)} />
+          <Action title="Join Room" icon={Icon.Phone} onAction={() => joinRoomWithFeedback(room.slug, label)} />
           <Action
             title={room.favorited ? "Remove Favorite" : "Add Favorite"}
             icon={Icon.Star}
@@ -92,9 +92,9 @@ function RoomItem({ room, primary = false, onChange }: { room: Room; primary?: b
   );
 }
 
-async function joinRoom(slug: string, label: string) {
+async function joinRoomWithFeedback(slug: string, label: string) {
   try {
-    await joinCall(slug);
+    await joinRoom(slug);
     await showHUD(`Joining ${label}`);
   } catch (error) {
     await showFailureToast(error, { title: "Could Not Join Room" });

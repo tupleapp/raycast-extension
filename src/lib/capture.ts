@@ -1,6 +1,5 @@
 import { CaptureRecord } from "./types";
 
-/** Render every captured category; unknown event payloads stay visible. */
 export function formatCapture(records: CaptureRecord[]): string {
   const names = new Map<number, string>();
   for (const { data } of records) {

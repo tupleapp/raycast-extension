@@ -4,11 +4,7 @@
 
 - Use canonical Call and Capture commands, complete Capture exports, and Connect prompts.
 - Preserve grouped search results and compact clock timestamps in Capture views and AI summaries.
-- Require the canonical Tuple CLI; release validation is tracked in `docs/canonical-cli-validation.md`.
-
-## [Compact Transcript Timestamps] - {PR_MERGE_DATE}
-
-- Transcript views and AI summaries keep compact clock timestamps as Tuple shifts its CLI default to full RFC3339 instants.
+- Require the canonical Tuple CLI without legacy command or error adapters.
 
 ## [Smarter Calls and Rooms] - 2026-08-20
 

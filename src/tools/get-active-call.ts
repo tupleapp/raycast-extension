@@ -8,14 +8,11 @@ import { getActiveCall, isNoActiveCall } from "../lib/tuple";
  * peer's audio and connection state only for direct calls) — treat null as unknown, not as unmuted.
  */
 export default async function () {
-  // the canonical CLI returns the normalized roster (self already excluded)
-  // and maps an idle state to NoActiveCall.
   try {
     const call = await getActiveCall();
     return {
       inCall: true,
       callId: call.call_id,
-      // The user's own mic and Capture state (transcription is per-participant).
       muted: call.muted,
       capturing: call.transcribing,
       // Slug of the room backing the call, or null for a direct call.

@@ -24,7 +24,7 @@ import {
   classifyError,
   deleteCapture,
   exportCapture,
-  getCompactCapture,
+  getLocalClockCapture,
   getConnectPrompt,
   stripAnsi,
   stripMatchMarkers,
@@ -235,7 +235,6 @@ function StoredCallEditor({
 interface MetadataActionParams {
   callId: string;
   title: string;
-  storedTitle: string;
   summary: string;
   onApplied: (applied: CallDraft) => void;
 }
@@ -260,7 +259,6 @@ function metadataActions(params: MetadataActionParams) {
 
 function CallActions({ callId, call, onChange }: { callId: string; call?: StoredCall; onChange: () => void }) {
   const title = call ? callTitle(call) : "Call";
-  const storedTitle = call?.title?.trim() ?? "";
   const summary = call?.summary?.trim() ?? "";
   return (
     <ActionPanel>
@@ -269,7 +267,7 @@ function CallActions({ callId, call, onChange }: { callId: string; call?: Stored
         icon={Icon.Text}
         target={<CaptureDetail callId={callId} call={call} onChange={onChange} />}
       />
-      {metadataActions({ callId, title, storedTitle, summary, onApplied: onChange })}
+      {metadataActions({ callId, title, summary, onApplied: onChange })}
       <Action
         title="Copy AI Context"
         icon={Icon.Clipboard}
@@ -320,12 +318,12 @@ function CaptureDetail({ callId, call, onChange }: { callId: string; call?: Stor
   const summary = applied?.summary ?? metadata.data?.summary?.trim() ?? call?.summary?.trim() ?? "";
   const title = storedTitle || (call ? callTitle(call) : "Capture");
   const handleApplied = (draft: CallDraft) => {
-    setApplied(draft);
+    setApplied({ title: draft.title || storedTitle, summary: draft.summary });
     metadata.revalidate();
     onChange?.();
   };
 
-  const { data, isLoading, error, revalidate } = usePromise(getCompactCapture, [callId], {
+  const { data, isLoading, error, revalidate } = usePromise(getLocalClockCapture, [callId], {
     onError: async (error) => {
       if (classifyError(error).kind === TupleErrorKind.Unknown) {
         await showFailureToast(error, { title: "Could Not Load Capture" });
@@ -352,7 +350,7 @@ function CaptureDetail({ callId, call, onChange }: { callId: string; call?: Stor
       markdown={buildCaptureMarkdown(title, summary, data)}
       actions={
         <ActionPanel>
-          {metadataActions({ callId, title, storedTitle, summary, onApplied: handleApplied })}
+          {metadataActions({ callId, title, summary, onApplied: handleApplied })}
           <Action title="Copy AI Context" icon={Icon.Clipboard} onAction={() => copyAiContext(callId)} />
           <Action
             title="Export Capture"
@@ -422,9 +420,8 @@ function formatCaptureText(raw: string): string {
 }
 
 /**
- * Most-recent first. The CLI's `capture search` returns matches in FTS-rank order, not by
- * time, so the view sorts them — within the returned page (`--limit`); a term with more matches than
- * the limit is still capped by the CLI's own ordering before this runs.
+ * The CLI caps search by FTS rank before returning a page, while this occurrence view presents that
+ * returned page newest-first. Sorting here cannot recover newer matches outside the CLI limit.
  */
 function byTimeDesc(a: CaptureMatch, b: CaptureMatch): number {
   return matchTime(b) - matchTime(a);

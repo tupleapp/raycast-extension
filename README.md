@@ -11,8 +11,8 @@ extension wraps the local `tuple` command-line tool.
   symlinks it to `/usr/local/bin/tuple`; the extension also falls back to the copy bundled in
   `Tuple.app` if you haven't done that. If yours lives elsewhere, set the **Tuple CLI Path**
   preference.
-- Capture features (**Search Calls**, **Summarize with AI**, and the AI tools) require
-  **Capture** to be enabled in Tuple (Settings → Capture). Stored Capture remains readable when live Capture is disabled.
+- **Capture** must be enabled in Tuple (Settings → Capture) to record new calls. **Search Calls**,
+  summaries, and AI tools can still read existing stored Capture when live Capture is disabled.
 
 ## Commands
 
@@ -48,8 +48,8 @@ The AI uses these read-only tools to answer:
 - **List Recent Calls**, **Search Capture**, **Read Capture**, **List Contacts**, **List Active Calls**, **Get Active Call**, **List Rooms**
 
 "Summarize with AI" (on any call) and the AI tools use Raycast's built-in AI and require
-**Raycast Pro**. Your captured context is sent to Raycast AI — nothing leaves your machine
-beyond Raycast's own service. Without Pro, use **Copy AI Context** (on any recorded call, or the
+**Raycast Pro**. Your captured context is sent to Raycast's AI service; the extension does not
+send it elsewhere. Without Pro, use **Copy AI Context** (on any recorded call, or the
 active call from the menu bar) to bring a call into any assistant you like.
 
 ## Preferences
@@ -59,12 +59,11 @@ active call from the menu bar) to bring a call into any assistant you like.
   lives elsewhere.
 - **Capture Export Folder** — Where Capture artifacts are saved. Defaults to your Downloads folder.
 
-## Canonical CLI cutover
+## CLI compatibility
 
-This branch requires the canonical Tuple CLI. It has no legacy command, optional-flag,
-stdout-error, or English-error adapters. The minimum release number must be set from
-an actual published Tuple build after the checks in [migration validation](docs/canonical-cli-validation.md)
-pass; publication is blocked until then. No guessed version number is enforced.
+This extension uses Tuple's canonical Call, Capture, and Connect commands and does not support
+legacy CLI command paths or error adapters. Normal auto-detection uses the production Tuple app;
+set **Tuple CLI Path** when validating another signed Tuple build.
 
 Capture exports are complete JSONL artifacts (conversation, events, and shared content)
 in the configured folder. Deleting a Capture removes its conversation, events, content,

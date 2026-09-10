@@ -1,7 +1,7 @@
 import { LaunchProps, showHUD, showToast, Toast } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { aiAvailable, generateCallMetadata } from "./lib/ai";
-import { listRecordedCalls, setCallSummary, setCallTitle } from "./lib/tuple";
+import { listRecordedCalls, setCallMetadata } from "./lib/tuple";
 
 /** Optional `{ "callId": "..." }` passed via deeplink `context=` for automation; absent for a hotkey run. */
 interface LaunchContext {
@@ -47,12 +47,10 @@ export default async function AutoTitleSummary(props: LaunchProps<{ launchContex
       toast.message = "The model didn’t return a usable title or summary. Try the editable version.";
       return;
     }
-    if (newTitle) {
-      await setCallTitle(callId, newTitle);
-    }
-    if (newSummary) {
-      await setCallSummary(callId, newSummary);
-    }
+    await setCallMetadata(
+      callId,
+      newTitle ? { title: newTitle, ...(newSummary ? { summary: newSummary } : {}) } : { summary: newSummary },
+    );
     await toast.hide();
     await showHUD(`Updated “${newTitle || "call"}”`);
   } catch (error) {
