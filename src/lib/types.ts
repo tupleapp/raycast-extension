@@ -160,7 +160,7 @@ export enum TupleErrorKind {
   AlreadyInCall = "already_in_call",
   /** The Tuple app/daemon is not running, so the CLI could not reach it. */
   DaemonDown = "daemon_down",
-  /** The transcript store doesn't exist yet — transcription has never run on this machine. */
+  /** The Capture store doesn't exist yet because Capture has never run on this machine. */
   CaptureUnavailable = "transcription_unavailable",
   /** `call start` refused: the target is offline. The app offers no start action for them either. */
   ContactOffline = "contact_offline",
@@ -222,6 +222,7 @@ export interface CaptureRecord {
     user_id?: number;
     text?: string;
     start?: string;
+    veiled?: boolean;
     [key: string]: unknown;
   };
 }

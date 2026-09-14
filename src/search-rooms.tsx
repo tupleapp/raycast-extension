@@ -7,18 +7,15 @@ import { primaryPersonalRoom, Room } from "./lib/types";
 
 export default function SearchRooms() {
   // `tuple rooms list` returns one flat, kind-tagged array, with occupants and the active-room
-  // marker resolved server-side. Pass --limit -1: this picker shows the user's complete room
-  // list, so opt out of the CLI's default count cap.
+  // marker resolved server-side. Pass --limit -1 so the primary personal room can be identified
+  // before the picker collapses old personal rooms to that single canonical entry.
   const { data, isLoading, error, revalidate } = useTupleJson<Room[]>(["rooms", "list", "--members", "--limit", "-1"], {
     failureTitle: "Could Not Load Rooms",
   });
 
   const rooms = data ?? [];
   const primaryRoom = primaryPersonalRoom(rooms);
-  const personal = sortRooms(
-    rooms.filter((room) => room.kind === "personal"),
-    primaryRoom?.slug,
-  );
+  const personal = primaryRoom ? [primaryRoom] : [];
   const team = sortRooms(rooms.filter((room) => room.kind === "team"));
 
   return (
@@ -70,7 +67,7 @@ function RoomItem({ room, primary = false, onChange }: { room: Room; primary?: b
 
   return (
     <List.Item
-      icon={Icon.Window}
+      icon={Icon.AppWindowGrid2x2}
       title={label}
       subtitle={occupants.length > 0 ? occupants.join(", ") : undefined}
       keywords={[room.slug, room.name, ...occupants]}
@@ -116,11 +113,8 @@ async function toggleFavorite(room: Room, label: string, onChange: () => void) {
 }
 
 /** Occupied rooms first, then favorites, then by name. */
-function sortRooms(rooms: Room[], primarySlug?: string): Room[] {
+function sortRooms(rooms: Room[]): Room[] {
   return [...rooms].sort((a, b) => {
-    if (primarySlug && (a.slug === primarySlug) !== (b.slug === primarySlug)) {
-      return a.slug === primarySlug ? -1 : 1;
-    }
     const aOccupied = a.members.length > 0;
     const bOccupied = b.members.length > 0;
     if (aOccupied !== bOccupied) {

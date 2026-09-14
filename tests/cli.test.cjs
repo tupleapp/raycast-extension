@@ -118,10 +118,18 @@ test("complete Capture NDJSON and clock rendering retain all categories", async 
   fake(`process.stdout.write(${JSON.stringify(fixture)});`);
   assert.deepEqual(await tuple.getCapture("call-id"), records);
   const compact = await tuple.getLocalClockCapture("call-id");
-  const clock = new Date(records[1].data.start).toLocaleTimeString("en-GB", { hour12: false });
-  assert.ok(compact.includes(`[${clock}] Riley Chen: Check C++:`));
-  assert.ok(compact.includes("user_joined"));
-  assert.ok(compact.includes("migration.ts"));
+  const clock = (instant) => new Date(instant).toLocaleTimeString("en-GB", { hour12: false });
+  assert.deepEqual(compact.split("\n"), [
+    `[${clock(records[0].time)}] Riley Chen joined`,
+    `[${clock(records[1].data.start)}] Riley Chen: Check C++: launch OR retry --flag?`,
+    `[${clock(records[2].time)}] Riley Chen shared Editor: migration.ts — https://example.com/migration`,
+  ]);
+  const illustrated = await tuple.getLocalClockCaptureMarkdown("call-id");
+  assert.deepEqual(illustrated.split("\n"), [
+    `⚡️ [${clock(records[0].time)}] Riley Chen joined`,
+    `💬 [${clock(records[1].data.start)}] Riley Chen: Check C++: launch OR retry --flag?`,
+    `🖥️ [${clock(records[2].time)}] Riley Chen shared Editor: migration.ts — https://example.com/migration`,
+  ]);
   assert.ok(calls().every((args) => !args.includes("--exclude")));
   fake(`process.stdout.write(${JSON.stringify(fixture)} + '{invalid');`);
   await assert.rejects(tuple.getCapture("call-id"));
@@ -172,6 +180,16 @@ test("room reads request and return occupant details", async () => {
   );
   const rooms = await tuple.listRooms("--limit", "-1");
   assert.deepEqual(rooms[0].members, [{ id: 7, full_name: "Riley Chen", email: "riley@example.com" }]);
+});
+
+test("room tool exposes only the primary personal room", async () => {
+  fake(
+    `process.stdout.write(JSON.stringify([{slug:'older',name:'',http_value:'https://tuple.app/c/older',created_at:'2026-09-09T12:00:00Z',favorited:false,members:[],kind:'personal',active_call:false},{slug:'newer',name:'',http_value:'https://tuple.app/c/newer',created_at:'2026-09-10T12:00:00Z',favorited:false,members:[],kind:'personal',active_call:false},{slug:'team',name:'Pairing',http_value:'https://tuple.app/c/team',created_at:'2026-09-10T12:00:00Z',favorited:false,members:[],kind:'team',active_call:false}]));`,
+  );
+  const listRooms = load("src/tools/list-rooms.ts").default;
+  const result = await listRooms();
+  assert.deepEqual(result.personal.map((room) => room.slug), ["newer"]);
+  assert.deepEqual(result.team.map((room) => room.slug), ["team"]);
 });
 
 test("primary-room selection is deterministic and the command joins only that slug", async () => {

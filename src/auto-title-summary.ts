@@ -9,7 +9,7 @@ interface LaunchContext {
 }
 
 /**
- * Headless counterpart to the "Generate Title & Summary…" action: drafts both from the transcript and
+ * Headless counterpart to the "Generate Title & Summary…" action: drafts both from captured context and
  * writes them straight to the call, skipping the editable form. Targets the call id from the launch
  * context (deeplink automation) or, by default, the most recently recorded call. Hotkey- and
  * deeplink-friendly; requires Raycast Pro for the AI call.

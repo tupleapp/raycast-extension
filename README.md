@@ -31,8 +31,8 @@ extension wraps the local `tuple` command-line tool.
   (drafted from captured context, editable before it’s saved), copy an AI context prompt, export
   it, or delete it.
 - **Search Rooms** — Browse your personal and team rooms, see who’s currently in each, and
-  join one, copy its link, or open it in the browser. Your primary personal room is identified
-  from the CLI's creation timestamp and shown first.
+  join one, copy its link, or open it in the browser. The personal section shows only your
+  primary personal room, identified from the CLI's creation timestamp.
 - **Join Personal Room** — Jump straight into your primary personal room.
 - **Generate Title & Summary** — Draft a title and summary for your most recent call with AI and save
   them immediately, with no review step (the in-call **Generate Title & Summary…** action is the

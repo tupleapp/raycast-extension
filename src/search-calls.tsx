@@ -24,7 +24,7 @@ import {
   classifyError,
   deleteCapture,
   exportCapture,
-  getLocalClockCapture,
+  getLocalClockCaptureMarkdown,
   getConnectPrompt,
   stripAnsi,
   stripMatchMarkers,
@@ -323,7 +323,7 @@ function CaptureDetail({ callId, call, onChange }: { callId: string; call?: Stor
     onChange?.();
   };
 
-  const { data, isLoading, error, revalidate } = usePromise(getLocalClockCapture, [callId], {
+  const { data, isLoading, error, revalidate } = usePromise(getLocalClockCaptureMarkdown, [callId], {
     onError: async (error) => {
       if (classifyError(error).kind === TupleErrorKind.Unknown) {
         await showFailureToast(error, { title: "Could Not Load Capture" });
@@ -402,10 +402,10 @@ async function exportWithFeedback(callId: string) {
   }
 }
 
-function buildCaptureMarkdown(title: string, summary: string, transcript: string | undefined): string {
+function buildCaptureMarkdown(title: string, summary: string, capture: string | undefined): string {
   const heading = `# ${title}`;
   const summaryBlock = summary.trim() ? `\n\n${summary.trim()}` : "";
-  const cleaned = transcript ? formatCaptureText(transcript) : "";
+  const cleaned = capture ? formatCaptureText(capture) : "";
   const body = cleaned ? `\n\n---\n\n${cleaned}` : "\n\n_No Capture records available._";
   return `${heading}${summaryBlock}${body}`;
 }

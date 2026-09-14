@@ -316,6 +316,10 @@ export async function getLocalClockCapture(callId: string): Promise<string> {
   return formatCapture(await getCapture(callId));
 }
 
+export async function getLocalClockCaptureMarkdown(callId: string): Promise<string> {
+  return formatCapture(await getCapture(callId), true);
+}
+
 /** Bounded store-owned recent calls, filtered before the limit is applied. */
 export function listRecordedCalls(opts: { limit?: number; participant?: string } = {}): Promise<StoredCall[]> {
   const args = ["capture", "list", "--limit", String(opts.limit ?? 100)];
