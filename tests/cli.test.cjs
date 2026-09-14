@@ -10,7 +10,7 @@ const fixture = fs.readFileSync(path.join(__dirname, "fixtures/capture.jsonl"), 
 const records = fixture.trim().split("\n").map(JSON.parse);
 const load = require("./load-typescript.cjs")(binary);
 const tuple = load("src/lib/tuple.ts");
-const { TupleErrorKind, contactCallAction, primaryPersonalRoom } = load("src/lib/types.ts");
+const { TupleErrorKind, contactCallAction, machineCallAction, primaryPersonalRoom } = load("src/lib/types.ts");
 function fake(body) {
   fs.writeFileSync(log, "");
   fs.writeFileSync(
@@ -245,6 +245,11 @@ test("guarded contacts use core joinability without capacity arithmetic", () => 
   );
   assert.equal(contactCallAction({ status: "busy", call: { joinable: true } }), "join");
   assert.equal(contactCallAction({ status: "busy" }), "none");
+});
+
+test("connected machines are callable only while idle", () => {
+  assert.equal(machineCallAction({ id: "machine-id", platform: "linux" }), "start");
+  assert.equal(machineCallAction({ id: "machine-id", platform: "mac", call_id: "call-id" }), "none");
 });
 
 test("old call JSON and malformed Capture records fail the cutover", async () => {

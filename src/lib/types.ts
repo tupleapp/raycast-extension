@@ -16,6 +16,17 @@ export interface Contact {
   call?: ContactCall | null;
 }
 
+export interface Machine {
+  id: string;
+  platform: string;
+  device_name?: string;
+  call_id?: string;
+}
+
+export function machineCallAction(machine: Machine): "start" | "none" {
+  return machine.call_id ? "none" : "start";
+}
+
 /**
  * The call a busy contact is on. `joinable` is the CLI's own derivation of the
  * predicate the engine enforces before letting anyone in, so consumers branch

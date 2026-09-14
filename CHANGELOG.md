@@ -5,6 +5,7 @@
 - Use canonical Call and Capture commands, complete Capture exports, and Connect prompts.
 - Preserve grouped search results and compact clock timestamps in Capture views and AI summaries.
 - Show one primary personal room with grid icons and render Capture as a readable, categorized timeline.
+- Include other connected machines alongside contacts and call idle machines by their canonical IDs.
 - Require the canonical Tuple CLI without legacy command or error adapters.
 
 ## [Smarter Calls and Rooms] - 2026-08-20

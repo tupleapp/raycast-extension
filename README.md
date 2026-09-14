@@ -16,11 +16,12 @@ extension wraps the local `tuple` command-line tool.
 
 ## Commands
 
-- **Search Contacts** — Browse your contacts with online status, favorites, and recents.
-  Start a call, toggle a favorite, or copy an email. Everyone stays listed, but the call
+- **Search Contacts** — Browse your contacts and other connected machines with live status.
+  Start a call, toggle a contact favorite, or copy an email or machine ID. Everyone stays listed, but the call
   action matches what Tuple will accept: start a call with someone online, join the call
   someone's already on while it has room, and neither for someone offline or on a full call.
   Raycast reports success only after the call connects, and joins switch cleanly from your current call.
+  Idle machines can be called directly; a machine already in a call stays visible without an invalid call action.
 - **Active Call** — A menu-bar command showing your current call. Mute/unmute, start or stop
   Capture, add a person, copy an AI context prompt, or leave the call — without leaving the menu bar.
 - **Toggle Mute** — Mute or unmute your microphone in the active call. Bind it to a global
