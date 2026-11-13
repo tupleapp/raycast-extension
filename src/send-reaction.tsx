@@ -41,7 +41,7 @@ export default function SendReaction() {
       ))}
       {error ? (
         <TupleErrorEmptyView error={error} onRetry={revalidate} />
-      ) : (
+      ) : data?.length === 0 ? (
         <List.EmptyView
           icon={Icon.Message}
           title="No Reactions Available"
@@ -52,7 +52,7 @@ export default function SendReaction() {
             </ActionPanel>
           }
         />
-      )}
+      ) : null}
     </List>
   );
 }
