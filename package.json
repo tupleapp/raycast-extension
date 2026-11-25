@@ -327,7 +327,8 @@
     "fix-lint": "ray lint --fix",
     "publish": "npx @raycast/api@latest publish",
     "test": "node --test tests/*.test.cjs",
-    "test:canonical": "node --test tests/canonical-cli.integration.cjs"
+    "test:canonical": "node --test tests/canonical-cli.integration.cjs",
+    "preview:feedback": "node scripts/build-feedback-preview.cjs"
   },
   "overrides": {
     "brace-expansion@1": "1.1.21",
