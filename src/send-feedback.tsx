@@ -50,7 +50,7 @@ export default function SendFeedback() {
         </ActionPanel>
       }
     >
-      <Form.Description text="Have an idea or hit a rough edge? Send it to the Tuple team using your signed-in Tuple account. Nothing is sent until you submit." />
+      <Form.Description text="Have an idea or hit a rough edge? Send it to the Tuple team using your signed-in Tuple account. Nothing is sent until you submit. Leaving this command discards unsent text." />
       <Form.TextArea
         id="message"
         title="Feedback"

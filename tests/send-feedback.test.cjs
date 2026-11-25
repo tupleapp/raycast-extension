@@ -51,6 +51,7 @@ test("opening and editing the form never sends feedback, and privacy information
   assert.match(copy, /Tuple team/);
   assert.match(copy, /signed-in Tuple account/);
   assert.match(copy, /analytics/);
+  assert.match(copy, /Leaving this command discards unsent text/);
   assert.match(copy, /does not use Raycast AI/);
   h.field().props.onChange("An idea");
   assert.equal(h.field().props.value, "An idea");
