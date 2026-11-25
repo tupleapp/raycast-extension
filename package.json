@@ -64,6 +64,17 @@
       "mode": "no-view"
     },
     {
+      "name": "send-feedback",
+      "title": "Send Feedback to Tuple",
+      "description": "Share an idea, bug report, or suggestion with the Tuple team.",
+      "mode": "view",
+      "keywords": [
+        "bug",
+        "suggestion",
+        "feature request"
+      ]
+    },
+    {
       "name": "send-reaction",
       "title": "Send Reaction",
       "description": "Choose a sound or webcam reaction from your installed Tuple CLI and send it to the active call.",

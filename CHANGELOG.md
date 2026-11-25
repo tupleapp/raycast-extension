@@ -1,5 +1,9 @@
 # Tuple Changelog
 
+## [Send Feedback to Tuple] - {PR_MERGE_DATE}
+
+- Share ideas, bug reports, and suggestions with the Tuple team from a dedicated feedback form. Requires Tuple 3.4.3 or later.
+
 ## [Stop Webcam] - 2026-11-25
 
 - Add Stop Webcam, as a hotkey-friendly command and in Active Call, to ask Tuple to stop sharing your webcam.
