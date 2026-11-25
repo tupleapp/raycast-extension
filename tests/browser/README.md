@@ -22,6 +22,21 @@ The generator allows only the known imports; unknown modules fail closed.
 The generated file is a test artifact, not an extension entry point. No browser
 adapter or fake CLI is included in the published Raycast commands.
 
+## Screenshot workflow for UI changes
+
+1. Use the repository's normal dependency install (`npm ci` in a fresh checkout),
+   then regenerate the preview with the command above. The generator and all
+   dependencies are versioned; no session-local packages or saved Canvas app
+   are required.
+2. Create or update a Canvas app from the generated code. Use the actual command
+   source, not a separately maintained mock of the form.
+3. Exercise the affected states with synthetic text and capture screenshots
+   from the rendered preview. For a copy/layout change, include the clean form;
+   for behavior changes, include the relevant error or success state.
+4. Share screenshots with short captions and attach current evidence to the PR.
+   Label them **browser harness, not native Raycast**. Prefer pictures over long
+   descriptions, and keep older captures labeled when the UI has changed.
+
 ## Checks
 
 ```sh

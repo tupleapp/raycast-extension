@@ -46,15 +46,14 @@ export default function SendFeedback() {
       isLoading={sending}
       actions={
         <ActionPanel>
-          <Action.SubmitForm title="Send Feedback to Tuple" icon={Icon.Message} onSubmit={submit} />
+          <Action.SubmitForm title="Send Feedback" icon={Icon.Message} onSubmit={submit} />
         </ActionPanel>
       }
     >
-      <Form.Description text="Have an idea or hit a rough edge? Send it to the Tuple team using your signed-in Tuple account. Nothing is sent until you submit. Leaving this command discards unsent text." />
       <Form.TextArea
         id="message"
         title="Feedback"
-        placeholder="What could we make better? For a bug, include what happened and what you expected."
+        placeholder="Share an idea or report a bug…"
         value={message}
         autoFocus
         ref={field}
@@ -65,14 +64,8 @@ export default function SendFeedback() {
         }}
         onBlur={(event) => setError(feedbackValidationError(event.target.value ?? ""))}
       />
-      <Form.Description
-        text={`${feedbackByteLength(message).toLocaleString()} / 4,000 bytes · Emoji and other non-ASCII text use more than one byte.`}
-      />
-      <Form.Separator />
-      <Form.Description
-        title="Before You Send"
-        text="Your message is sent through Tuple’s feedback analytics with your account and app details. Don’t include passwords or sensitive call content. This does not use Raycast AI. Requires Tuple 3.4.3 or later."
-      />
+      <Form.Description text={`${feedbackByteLength(message).toLocaleString()} / 4,000 bytes`} />
+      <Form.Description text="Sent via Tuple analytics with your account and app details. Avoid sensitive information. Unsent drafts aren’t saved." />
     </Form>
   );
 }

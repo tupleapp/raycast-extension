@@ -25,3 +25,16 @@ stay in our repository.
    Linear issue records the publication link and completed status. If review or
    publication is pending, leave the issue open with the upstream link and
    remaining step.
+
+# UI development
+
+For UI work, use the versioned browser harness and screenshot workflow in
+[`tests/browser/README.md`](tests/browser/README.md). Regenerate it from the
+current checkout in fresh or restored environments; Canvas and `/tmp` copies
+are previews, not the source of truth. Extend the harness for other commands
+when needed, keeping production transports replaced with fakes.
+
+Show UI changes with screenshots and short captions. Keep form copy minimal:
+one clear action, concise supporting text, and only necessary disclosures.
+Label browser-harness captures accurately; native Raycast behavior needs native
+validation.

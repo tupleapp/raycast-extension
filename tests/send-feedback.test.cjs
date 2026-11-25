@@ -48,11 +48,14 @@ test("opening and editing the form never sends feedback, and privacy information
   assert.notEqual(form.props.enableDrafts, true);
   assert.equal(h.field().props.autoFocus, true);
   const copy = form.props.children.map((child) => child.props.text ?? "").join(" ");
-  assert.match(copy, /Tuple team/);
-  assert.match(copy, /signed-in Tuple account/);
+  assert.match(copy, /account and app details/);
   assert.match(copy, /analytics/);
-  assert.match(copy, /Leaving this command discards unsent text/);
-  assert.match(copy, /does not use Raycast AI/);
+  assert.match(copy, /Avoid sensitive information/);
+  assert.match(copy, /Unsent drafts aren’t saved/);
+  const descriptions = form.props.children.filter((child) => child.type === Form.Description);
+  assert.equal(descriptions.length, 2);
+  assert.equal(descriptions[0].props.text, "0 / 4,000 bytes");
+  assert.equal(form.props.actions.props.children.props.title, "Send Feedback");
   h.field().props.onChange("An idea");
   assert.equal(h.field().props.value, "An idea");
   assert.deepEqual(h.calls, []);
