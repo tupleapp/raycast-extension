@@ -43,7 +43,7 @@ export default function SendFeedback() {
 
   return (
     <Form
-      navigationTitle="Send Feedback to Tuple"
+      navigationTitle="Send Feedback"
       isLoading={sending}
       actions={
         <ActionPanel>

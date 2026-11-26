@@ -45,6 +45,7 @@ test("opening and editing the form never sends feedback, and privacy information
   const h = harness();
   const form = h.render();
   assert.equal(form.type, Form);
+  assert.equal(form.props.navigationTitle, "Send Feedback");
   assert.notEqual(form.props.enableDrafts, true);
   assert.equal(h.field().props.autoFocus, true);
   const copy = form.props.children.filter(Boolean).map((child) => child.props.text ?? "").join(" ");
