@@ -48,10 +48,7 @@ test("opening and editing the form never sends feedback, and privacy information
   assert.notEqual(form.props.enableDrafts, true);
   assert.equal(h.field().props.autoFocus, true);
   const copy = form.props.children.filter(Boolean).map((child) => child.props.text ?? "").join(" ");
-  assert.match(copy, /account and app details/);
-  assert.match(copy, /analytics/);
-  assert.match(copy, /Avoid sensitive information/);
-  assert.match(copy, /Unsent drafts aren’t saved/);
+  assert.equal(copy.trim(), "Includes your Tuple account and app details.");
   const descriptions = form.props.children.filter((child) => child?.type === Form.Description);
   assert.equal(descriptions.length, 1);
   assert.doesNotMatch(copy, /bytes|4,000|Almost at the limit/);

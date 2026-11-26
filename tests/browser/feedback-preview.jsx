@@ -41,7 +41,7 @@ export function createPreview(loadCommand, types, sourceVersion) {
         </header>
         <div className="command-body">{children}</div>
         <footer>
-          <span>{isLoading ? "Submitting…" : "No production connection"}</span>
+          <span>{isLoading ? "Submitting…" : ""}</span>
           <FormState.Provider value={form}>{actions}</FormState.Provider>
         </footer>
       </form>

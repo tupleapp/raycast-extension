@@ -66,7 +66,7 @@ export default function SendFeedback() {
         onBlur={(event) => setError(feedbackValidationError(event.target.value ?? ""))}
       />
       {lengthWarning && <Form.Description text={lengthWarning} />}
-      <Form.Description text="Sent via Tuple analytics with your account and app details. Avoid sensitive information. Unsent drafts aren’t saved." />
+      <Form.Description text="Includes your Tuple account and app details." />
     </Form>
   );
 }
