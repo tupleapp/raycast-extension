@@ -51,7 +51,9 @@ to reset the call counts. Reset and response controls are disabled for all
 in-flight requests (both normal simulated latency and explicitly paused sends).
 
 1. Submit an empty form. Expect an inline validation error and zero CLI calls.
-2. Enter 1,001 `🙂` emoji. Expect 4,004 bytes, a limit error, and zero submissions.
+2. Enter a short message: expect no length counter. At 900 `🙂` emoji, expect
+   “Almost at the limit.” At 1,001 emoji, expect “Please shorten your feedback”
+   and zero submissions. The underlying UTF-8 limit stays internal.
 3. Choose **Signed out**, enter sample feedback, and submit. Expect sign-in
    guidance, retained text, one support check, and one failed fake submission.
 4. Choose **Success** and check **Pause feedback response**. Submit, submit

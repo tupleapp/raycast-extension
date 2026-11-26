@@ -7,10 +7,15 @@ export function feedbackByteLength(message: string): number {
   return Buffer.byteLength(message.trim(), "utf8");
 }
 
+export function feedbackLengthWarning(message: string): string | undefined {
+  const length = feedbackByteLength(message);
+  if (length >= MAX_FEEDBACK_BYTES * 0.9 && length <= MAX_FEEDBACK_BYTES) return "Almost at the limit.";
+}
+
 export function feedbackValidationError(message: string): string | undefined {
   if (!message.trim()) return "Enter some feedback before sending.";
   if (message.includes("\0")) return "Remove null characters before sending.";
-  if (feedbackByteLength(message) > MAX_FEEDBACK_BYTES) return "Keep your feedback within 4,000 bytes.";
+  if (feedbackByteLength(message) > MAX_FEEDBACK_BYTES) return "Please shorten your feedback.";
 }
 
 export async function sendFeedback(message: string): Promise<void> {

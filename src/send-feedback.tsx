@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Form, Icon, showToast, Toast } from "@raycast/api";
 import { useRef, useState } from "react";
-import { feedbackByteLength, feedbackValidationError, sendFeedback, feedbackErrorMessage } from "./lib/feedback";
+import { feedbackLengthWarning, feedbackValidationError, sendFeedback, feedbackErrorMessage } from "./lib/feedback";
 
 export default function SendFeedback() {
   const [message, setMessage] = useState("");
@@ -8,6 +8,7 @@ export default function SendFeedback() {
   const [sending, setSending] = useState(false);
   const inFlight = useRef(false);
   const field = useRef<Form.TextArea>(null);
+  const lengthWarning = feedbackLengthWarning(message);
 
   async function submit(values: { message: string }) {
     if (inFlight.current) return false;
@@ -64,7 +65,7 @@ export default function SendFeedback() {
         }}
         onBlur={(event) => setError(feedbackValidationError(event.target.value ?? ""))}
       />
-      <Form.Description text={`${feedbackByteLength(message).toLocaleString()} / 4,000 bytes`} />
+      {lengthWarning && <Form.Description text={lengthWarning} />}
       <Form.Description text="Sent via Tuple analytics with your account and app details. Avoid sensitive information. Unsent drafts aren’t saved." />
     </Form>
   );

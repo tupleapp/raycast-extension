@@ -7,7 +7,7 @@ const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "tuple-feedback-test-"));
 const binary = path.join(scratch, "tuple");
 const log = path.join(scratch, "args.jsonl");
 const load = require("./load-typescript.cjs")(binary);
-const { sendFeedback, feedbackValidationError, feedbackByteLength, feedbackErrorMessage } = load("src/lib/feedback.ts");
+const { sendFeedback, feedbackValidationError, feedbackByteLength, feedbackLengthWarning, feedbackErrorMessage } = load("src/lib/feedback.ts");
 const { TupleError, TupleErrorKind } = load("src/lib/types.ts");
 const help = "Usage:\n  tuple feedback <message> [flags]\n";
 
@@ -26,10 +26,15 @@ test.after(() => fs.rmSync(scratch, { recursive: true, force: true }));
 test("feedback validation matches the 4000-byte limit without truncation", () => {
   for (const message of ["", " \t\r\n", "\u00a0"]) assert.match(feedbackValidationError(message), /Enter/);
   assert.equal(feedbackByteLength("  hello \n"), 5);
+  assert.equal(feedbackLengthWarning("x".repeat(3599)), undefined);
+  assert.equal(feedbackLengthWarning("x".repeat(3600)), "Almost at the limit.");
+  assert.equal(feedbackLengthWarning("🙂".repeat(900)), "Almost at the limit.");
+  assert.equal(feedbackLengthWarning("x".repeat(4000)), "Almost at the limit.");
+  assert.equal(feedbackLengthWarning("x".repeat(4001)), undefined);
   assert.equal(feedbackValidationError("x".repeat(4000)), undefined);
   assert.equal(feedbackValidationError("🙂".repeat(1000)), undefined);
-  assert.match(feedbackValidationError("🙂".repeat(1000) + "x"), /4,000 bytes/);
-  assert.match(feedbackValidationError("x".repeat(4001)), /4,000 bytes/);
+  assert.match(feedbackValidationError("🙂".repeat(1000) + "x"), /shorten/);
+  assert.match(feedbackValidationError("x".repeat(4001)), /shorten/);
   assert.match(feedbackValidationError("a\0b"), /null/);
 });
 

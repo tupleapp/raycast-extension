@@ -36,7 +36,7 @@ function harness(send = async () => {}) {
   });
   const Component = load("src/send-feedback.tsx").default;
   function render() { index = 0; return Component(); }
-  function field() { return render().props.children.find((child) => child.type === Form.TextArea); }
+  function field() { return render().props.children.find((child) => child?.type === Form.TextArea); }
   function submit() { return render().props.actions.props.children.props.onSubmit({ message: field().props.value }); }
   return { render, field, submit, calls, toasts, focused: () => focused };
 }
@@ -47,17 +47,33 @@ test("opening and editing the form never sends feedback, and privacy information
   assert.equal(form.type, Form);
   assert.notEqual(form.props.enableDrafts, true);
   assert.equal(h.field().props.autoFocus, true);
-  const copy = form.props.children.map((child) => child.props.text ?? "").join(" ");
+  const copy = form.props.children.filter(Boolean).map((child) => child.props.text ?? "").join(" ");
   assert.match(copy, /account and app details/);
   assert.match(copy, /analytics/);
   assert.match(copy, /Avoid sensitive information/);
   assert.match(copy, /Unsent drafts aren’t saved/);
-  const descriptions = form.props.children.filter((child) => child.type === Form.Description);
-  assert.equal(descriptions.length, 2);
-  assert.equal(descriptions[0].props.text, "0 / 4,000 bytes");
+  const descriptions = form.props.children.filter((child) => child?.type === Form.Description);
+  assert.equal(descriptions.length, 1);
+  assert.doesNotMatch(copy, /bytes|4,000|Almost at the limit/);
   assert.equal(form.props.actions.props.children.props.title, "Send Feedback");
   h.field().props.onChange("An idea");
   assert.equal(h.field().props.value, "An idea");
+  assert.deepEqual(h.calls, []);
+});
+
+test("length feedback stays quiet until near the limit and uses plain-language errors", () => {
+  const h = harness();
+  const descriptions = () => h.render().props.children.filter((child) => child?.type === Form.Description).map((child) => child.props.text).join(" ");
+  h.field().props.onChange("x".repeat(3599));
+  assert.doesNotMatch(descriptions(), /Almost at the limit/);
+  h.field().props.onChange("🙂".repeat(900));
+  assert.match(descriptions(), /Almost at the limit/);
+  h.field().props.onChange("🙂".repeat(1001));
+  assert.match(h.field().props.error, /Please shorten your feedback/);
+  assert.doesNotMatch(descriptions(), /Almost at the limit|bytes|4,000/);
+  h.field().props.onChange("A shorter idea");
+  assert.equal(h.field().props.error, undefined);
+  assert.doesNotMatch(descriptions(), /Almost at the limit/);
   assert.deepEqual(h.calls, []);
 });
 
@@ -67,7 +83,7 @@ test("invalid submissions focus the feedback field and make no request", async (
   assert.match(h.field().props.error, /Enter/);
   h.field().props.onChange("🙂".repeat(1001));
   assert.equal(await h.submit(), false);
-  assert.match(h.field().props.error, /4,000 bytes/);
+  assert.match(h.field().props.error, /Please shorten your feedback/);
   assert.equal(h.focused(), 2);
   assert.equal(h.toasts.length, 0);
   assert.deepEqual(h.calls, []);
