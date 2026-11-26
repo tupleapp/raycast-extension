@@ -64,6 +64,17 @@
       "mode": "no-view"
     },
     {
+      "name": "send-feedback",
+      "title": "Send Feedback to Tuple",
+      "description": "Share an idea, bug report, or suggestion with the Tuple team.",
+      "mode": "view",
+      "keywords": [
+        "bug",
+        "suggestion",
+        "feature request"
+      ]
+    },
+    {
       "name": "send-reaction",
       "title": "Send Reaction",
       "description": "Choose a sound or webcam reaction from your installed Tuple CLI and send it to the active call.",
@@ -316,7 +327,8 @@
     "fix-lint": "ray lint --fix",
     "publish": "npx @raycast/api@latest publish",
     "test": "node --test tests/*.test.cjs",
-    "test:canonical": "node --test tests/canonical-cli.integration.cjs"
+    "test:canonical": "node --test tests/canonical-cli.integration.cjs",
+    "preview:feedback": "node scripts/build-feedback-preview.cjs"
   },
   "overrides": {
     "brace-expansion@1": "1.1.21",

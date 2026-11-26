@@ -32,6 +32,15 @@ extension wraps the local `tuple` command-line tool.
   installed CLI offers them; other participants need a supporting Tuple version to see them.
   Discovery does not send a reaction or require an active call. Sending requires an active call
   and may play a sound or animation for participants. These are user actions, not AI tools.
+- **Send Feedback to Tuple** — Share an idea, bug report, or suggestion with the Tuple team.
+  Review your message, then explicitly submit it using your signed-in Tuple account; no active call
+  or Raycast Pro is needed. Requires the Tuple app and selected CLI from **macOS 3.4.3 or later**.
+  The form checks CLI support without sending feedback. Messages are limited to **4,000 UTF-8 bytes**
+  after trimming surrounding whitespace, not 4,000 characters. Submission includes your account
+  identity and normal app/device analytics context; do not include passwords or sensitive call content.
+  Nothing is sent to Raycast AI. “Feedback Submitted” means Tuple accepted it for asynchronous
+  analytics delivery, not that the team has received or read it. Failures keep your draft in the open
+  form and are never automatically retried. Drafts are not saved when you leave the command.
 - **Toggle Mute** — Mute or unmute your microphone in the active call. Bind it to a global
   hotkey for hands-free control.
 - **Stop Webcam** — Ask Tuple to stop sharing your webcam in the active call, also available from
